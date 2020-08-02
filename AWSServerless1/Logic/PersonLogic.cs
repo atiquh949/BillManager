@@ -95,14 +95,14 @@ namespace BillManagerServerless.Logic
             return personDetail;
         }
 
-        public async Task<PersonDetail> PostPerson(PersonRequest person)
+        public async Task<PersonDetail> CreatePerson(PersonRequest personRequest)
         {
-            Person personObj = GetPersonObj(person);
+            Person Person = GetPersonObj(personRequest);
 
-            _context.Person.Add(personObj);
+            _context.Person.Add(Person);
             await _context.SaveChangesAsync();
 
-            PersonDetail personDetail = GetPersonDetail(personObj);
+            PersonDetail personDetail = GetPersonDetail(Person);
             return personDetail;
         }
 

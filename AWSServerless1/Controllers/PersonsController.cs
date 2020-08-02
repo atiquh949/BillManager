@@ -22,7 +22,7 @@ namespace BillManagerServerless.Controllers
 
         // GET: api/Persons
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PersonDetail>>> GetPersons() //TODO: do not return Person table object
+        public async Task<ActionResult<IEnumerable<PersonDetail>>> GetPersons()
         {
             try
             {
@@ -104,7 +104,7 @@ namespace BillManagerServerless.Controllers
                     return StatusCode(StatusCodes.Status403Forbidden, errors);
                 }
 
-                PersonDetail personDetail = await _logic.PostPerson(person);
+                PersonDetail personDetail = await _logic.CreatePerson(person);
                 return StatusCode(StatusCodes.Status200OK, personDetail);
             }
             catch (Exception e)

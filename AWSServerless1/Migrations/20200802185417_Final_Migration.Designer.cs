@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BillManagerServerless.Migrations
 {
     [DbContext(typeof(BillManagerDBContext))]
-    [Migration("20200802182357_Fina_Migration")]
-    partial class Fina_Migration
+    [Migration("20200802185417_Final_Migration")]
+    partial class Final_Migration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

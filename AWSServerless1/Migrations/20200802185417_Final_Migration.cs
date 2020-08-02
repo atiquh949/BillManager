@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BillManagerServerless.Migrations
 {
-    public partial class Fina_Migration : Migration
+    public partial class Final_Migration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

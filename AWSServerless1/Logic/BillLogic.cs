@@ -22,7 +22,7 @@ namespace BillManagerServerless.Logic
 
             foreach (var bill in await _context.Bill.ToListAsync())
             {
-                result.Add(await GetBillDetail(bill.Id));
+                result.Add(await GetBillDetail(bill));
             }
 
             return result;
@@ -32,24 +32,19 @@ namespace BillManagerServerless.Logic
         {
             return await _context.Bill.FindAsync(id);
         }
-
         public async Task<BillDetail> GetBillDetail(long id)
         {
-            Bill bill = await _context.Bill.FindAsync(id);
-
-            BillDetail billDetail = GetBillDetail(bill);
-
-            return billDetail;
+            return await GetBillDetail(await _context.Bill.FindAsync(id));
         }
 
-        private BillDetail GetBillDetail(Bill bill)
+        public async Task<BillDetail> GetBillDetail(Bill bill)
         {
             if (bill == null)
                 return null;
 
-            Dictionary<long, decimal> peopleAmounts = _context.PersonBill
+            Dictionary<long, decimal> peopleAmounts = await _context.PersonBill
                                                               .Where(pb => pb.BillId == bill.Id)
-                                                              .ToDictionary(pb => pb.PersonId, pb => decimal.Parse(string.Format("{0:.##}", pb.Share)));
+                                                              .ToDictionaryAsync(pb => pb.PersonId, pb => decimal.Parse(string.Format("{0:.##}", pb.Share)));
 
             List<Person> people = _context.Person
                                           .Where(p => peopleAmounts.Keys.Contains(p.Id))
@@ -92,7 +87,7 @@ namespace BillManagerServerless.Logic
 
             await CreateBillShares(billRequest, bill.Id);
 
-            return GetBillDetail(bill);
+            return await GetBillDetail(bill);
         }
 
         private async Task CreateBillShares(BillRequest billRequest, long billID)
@@ -159,6 +154,9 @@ namespace BillManagerServerless.Logic
 
             if (billRequest.People == null || billRequest.People.Length == 0)
                 error_result += ("- Bill must include at least one person." + Environment.NewLine);
+
+            if (billRequest.People.Distinct().Count() != billRequest.People.Count())
+                error_result += ("- List of ids of persons associated will bill should have no repeat value." + Environment.NewLine);
 
             return error_result;
         }
