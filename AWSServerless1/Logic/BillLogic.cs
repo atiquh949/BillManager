@@ -144,19 +144,19 @@ namespace BillManagerServerless.Logic
             string error_result = "";
 
             if (billRequest.TotalAmount <= 0)
-                error_result += ("- Total Amount must be greater than zero." + Environment.NewLine);
+                error_result += "- Total Amount must be greater than zero." + Environment.NewLine;
 
-            if(ValueHasMoreThanTwoDecimalPlaces(billRequest.TotalAmount))
-                error_result += ("- Total Amount is in invalid format." + Environment.NewLine);
+            if (ValueHasMoreThanTwoDecimalPlaces(billRequest.TotalAmount))
+                error_result += "- Total Amount is in invalid format." + Environment.NewLine;
 
-            if (String.IsNullOrEmpty(billRequest.Title))
-                error_result += ("- Title is required." + Environment.NewLine);
+            if (string.IsNullOrEmpty(billRequest.Title))
+                error_result += "- Title is required." + Environment.NewLine;
 
             if (billRequest.People == null || billRequest.People.Length == 0)
-                error_result += ("- Bill must include at least one person." + Environment.NewLine);
+                error_result += "- Bill must include at least one person." + Environment.NewLine;
 
             if (billRequest.People.Distinct().Count() != billRequest.People.Count())
-                error_result += ("- List of ids of persons associated will bill should have no repeat value." + Environment.NewLine);
+                error_result += "- List of ids of persons associated will bill should have no repeat value." + Environment.NewLine;
 
             return error_result;
         }

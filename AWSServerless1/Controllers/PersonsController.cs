@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
+using BillManagerServerless.Common;
 using BillManagerServerless.Data;
 using BillManagerServerless.Logic;
 using Microsoft.AspNetCore.Http;
@@ -77,7 +78,7 @@ namespace BillManagerServerless.Controllers
 
                 string errors = await _logic.ValidatePerson(person);
 
-                if (!String.IsNullOrEmpty(errors))
+                if (!string.IsNullOrEmpty(errors))
                 {
                     return StatusCode(StatusCodes.Status403Forbidden, errors);
                 }
@@ -99,7 +100,7 @@ namespace BillManagerServerless.Controllers
             try
             {
                 string errors = await _logic.ValidatePerson(person);
-                if (!String.IsNullOrEmpty(errors))
+                if (!string.IsNullOrEmpty(errors))
                 {
                     return StatusCode(StatusCodes.Status403Forbidden, errors);
                 }
@@ -130,12 +131,19 @@ namespace BillManagerServerless.Controllers
                 await _logic.DeletePerson(person);
                 return StatusCode(StatusCodes.Status200OK);
             }
+            catch (PersonDeleteBillAssociatedException)
+            {
+                return StatusCode(StatusCodes.Status409Conflict, "Unable to delete person as its associated with a bill");
+            }
+            catch (PersonDeleteException)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Unable to delete person");
+            }
             catch (Exception e)
             {
                 LambdaLogger.Log("Error in DeletePerson: " + e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error.");
             }
         }
-
     }
 }

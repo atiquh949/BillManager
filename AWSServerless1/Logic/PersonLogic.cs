@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BillManagerServerless.Data;
+using Amazon.Lambda.Core;
+using BillManagerServerless.Common;
 
 namespace BillManagerServerless.Logic
 {
@@ -61,7 +63,8 @@ namespace BillManagerServerless.Logic
                 FirstName = person.FirstName,
                 LastName = person.LastName,
                 PhoneNumber = person.PhoneNumber,
-                Bills = billDetails?.Count == 0 ? null : billDetails
+                //Bills = billDetails?.Count == 0 ? null : billDetails
+                Bills = billDetails
             };
 
             return personDetail;
@@ -121,9 +124,21 @@ namespace BillManagerServerless.Logic
 
         public async Task<Person> DeletePerson(Person person)
         {
-            _context.Person.Remove(person);
-            await _context.SaveChangesAsync();
-            return person;
+            try
+            {
+                _context.Person.Remove(person);
+                await _context.SaveChangesAsync();
+                return person;
+            }
+            catch (Exception e)
+            {
+                LambdaLogger.Log("Error in DeletePerson. Person id: " + person.Id + " Exception: " + e.ToString());
+
+                if (e.InnerException != null && e.InnerException.Message.Contains("FK_PersonBillShare_Person_PersonId"))
+                    throw new PersonDeleteBillAssociatedException();
+                else
+                    throw new PersonDeleteException();
+            }
         }
 
         public async Task<string> ValidatePerson(PersonRequest person)
@@ -131,20 +146,20 @@ namespace BillManagerServerless.Logic
             string error_result = "";
 
             if (string.IsNullOrEmpty(person.FirstName))
-                error_result += ("- First Name is required." + Environment.NewLine);
+                error_result += "- First Name is required." + Environment.NewLine;
             if (string.IsNullOrEmpty(person.LastName))
-                error_result += ("- Last Name is required." + Environment.NewLine);
+                error_result += "- Last Name is required." + Environment.NewLine;
             if (string.IsNullOrEmpty(person.PhoneNumber))
-                error_result += ("- Phone Number is required." + Environment.NewLine);
+                error_result += "- Phone Number is required." + Environment.NewLine;
             else
             {
                 if (!Regex.Match(person.PhoneNumber, @"^\d{3}-\d{3}-\d{4}$").Success)
-                    error_result += ("- Phone Number has incorrect format." + Environment.NewLine);
+                    error_result += "- Phone Number has incorrect format." + Environment.NewLine;
 
                 Person person_result = await _context.Person.Where(p => p.PhoneNumber == person.PhoneNumber
                                                                     && p.Id != person.Id).FirstOrDefaultAsync();
                 if (person_result != null)
-                    error_result += ("- Phone Number already exists." + Environment.NewLine);
+                    error_result += "- Phone Number already exists." + Environment.NewLine;
             }
             return error_result;
         }
