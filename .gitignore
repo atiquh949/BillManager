@@ -1,7 +1,5 @@
 *.vs
 
-AWSServerless1/AWSServerless1/.vs
-
 AWSServerless1/bin
 AWSServerless1/obj
 

@@ -37,7 +37,7 @@ namespace BillManagerServerless.Controllers
 
         // GET: api/Bills/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<BillDetail>> GetBill(int id)
+        public async Task<ActionResult<BillDetail>> GetBill(long id)
         {
             try
             {
@@ -52,7 +52,7 @@ namespace BillManagerServerless.Controllers
             }
             catch (Exception e)
             {
-                LambdaLogger.Log("Error in GetBill(int id)" + e.ToString());
+                LambdaLogger.Log("Error in GetBill" + e.ToString());
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error.");
             }
         }
@@ -82,7 +82,7 @@ namespace BillManagerServerless.Controllers
 
         //DELETE: api/Bills/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteBill(int id)
+        public async Task<ActionResult> DeleteBill(long id)
         {
             try
             {

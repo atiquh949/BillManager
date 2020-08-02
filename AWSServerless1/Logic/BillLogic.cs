@@ -28,7 +28,7 @@ namespace BillManagerServerless.Logic
             return result;
         }
 
-        public async Task<Bill> GetBill(int id)
+        public async Task<Bill> GetBill(long id)
         {
             return await _context.Bill.FindAsync(id);
         }
@@ -101,7 +101,7 @@ namespace BillManagerServerless.Logic
             List<PersonBillShare> peopleBill = new List<PersonBillShare>();
             bool pennyAdjustNeeded = ValueHasMoreThanTwoDecimalPlaces(share);
 
-            foreach (int personId in billRequest.People)
+            foreach (long personId in billRequest.People)
             {
                 PersonBillShare personBill = new PersonBillShare();
                 personBill.PersonId = personId;

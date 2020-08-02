@@ -67,7 +67,7 @@ namespace BillManagerServerless.Logic
             return personDetail;
         }
 
-        public async Task<PersonDetail> GetPersonDetail(int id)
+        public async Task<PersonDetail> GetPersonDetail(long id)
         {
             Person person = await _context.Person.FindAsync(id);
             
@@ -78,7 +78,7 @@ namespace BillManagerServerless.Logic
             return personDetail;
         }
 
-        public async Task<Person> GetPerson(int id)
+        public async Task<Person> GetPerson(long id)
         {
             return await _context.Person.FindAsync(id);
         }

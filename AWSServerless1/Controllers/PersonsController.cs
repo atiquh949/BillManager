@@ -37,7 +37,7 @@ namespace BillManagerServerless.Controllers
 
         // GET: api/Persons/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PersonDetail>> GetPerson(int id)
+        public async Task<ActionResult<PersonDetail>> GetPerson(long id)
         {
             try
             {
@@ -59,7 +59,7 @@ namespace BillManagerServerless.Controllers
 
         // PUT: api/Persons/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<PersonDetail>> PutPerson(int id, PersonRequest person)
+        public async Task<ActionResult<PersonDetail>> PutPerson(long id, PersonRequest person)
         {
             try
             {
@@ -116,7 +116,7 @@ namespace BillManagerServerless.Controllers
 
         // DELETE: api/Persons/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeletePerson(int id)
+        public async Task<ActionResult> DeletePerson(long id)
         {
             try
             {
