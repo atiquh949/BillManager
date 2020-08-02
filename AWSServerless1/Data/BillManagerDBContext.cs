@@ -18,14 +18,17 @@ namespace BillManagerServerless.Data
             builder.Entity<PersonBillShare>()
                 .HasOne(x => x.Person)
                 .WithMany(x => x.PersonBillShares)
-                .HasForeignKey(x => x.PersonId).OnDelete(DeleteBehavior.SetNull);
-                //.WillCascadeOnDelete(false);
+                .HasForeignKey(x => x.PersonId).OnDelete(DeleteBehavior.NoAction);
 
 
             builder.Entity<PersonBillShare>()
                 .HasOne(x => x.Bill)
                 .WithMany(x => x.PersonBillShares)
                 .HasForeignKey(x => x.BillId);
+
+            builder.Entity<Person>(entity => {
+                entity.HasIndex(e => e.PhoneNumber).IsUnique();
+            });
         }
     }
 }

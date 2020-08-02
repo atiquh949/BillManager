@@ -34,7 +34,7 @@ namespace BillManagerServerless.Logic
             if (person == null)
                 return null;
 
-            int[] billIds = _context.PersonBill
+            long[] billIds = _context.PersonBill
                                         .Where(pb => pb.PersonId == person.Id).Select(pb => pb.BillId).ToArray();
 
             List<Bill> bills = _context.Bill
@@ -50,7 +50,7 @@ namespace BillManagerServerless.Logic
                     Id = bill.Id,
                     TotalAmount = bill.TotalAmount,
                     Title = bill.Title,
-                    CreateDateTime = bill.Datetime
+                    CreateDateTime = bill.CreateDateTime
                 };
                 billDetails.Add(bd);
             }
@@ -83,14 +83,15 @@ namespace BillManagerServerless.Logic
             return await _context.Person.FindAsync(id);
         }
 
-        public async Task<PersonDetail> PutPerson(PersonRequest person)
+        public async Task<PersonDetail> UpdatePerson(Person existingPerson, PersonRequest person)
         {
-            Person personObj = GetPersonObj(person);
+            existingPerson.FirstName = person.FirstName;
+            existingPerson.LastName = person.LastName;
 
-            _context.Entry(personObj).State = EntityState.Modified;
+            _context.Entry(existingPerson).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            PersonDetail personDetail = GetPersonDetail(personObj);
+            PersonDetail personDetail = GetPersonDetail(existingPerson);
             return personDetail;
         }
 

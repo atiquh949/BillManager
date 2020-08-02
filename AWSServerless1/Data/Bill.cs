@@ -10,17 +10,23 @@ namespace BillManagerServerless.Data
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public long Id { get; set; }
+
+        [Column(TypeName = "decimal(18,2)")]
         public decimal TotalAmount { get; set; }
+
+        [Required]
+        [Column(TypeName = "nvarchar(100)")]
         public string Title { get; set; }
-        public DateTime Datetime { get; set; }
+
+        public DateTimeOffset CreateDateTime { get; set; }
 
         public virtual ICollection<PersonBillShare> PersonBillShares { get; set; }
     }
 
     public class BillRequest
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public decimal TotalAmount { get; set; }
         public string Title { get; set; }
         public int[] People { get; set; }
@@ -28,10 +34,10 @@ namespace BillManagerServerless.Data
 
     public class BillDetail
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public decimal? TotalAmount { get; set; }
         public string Title { get; set; }
-        public DateTime CreateDateTime { get; set; }
+        public DateTimeOffset CreateDateTime { get; set; }
 
         public List<PersonDetail> People { get; set; }
     }

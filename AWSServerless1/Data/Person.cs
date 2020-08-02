@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
 namespace BillManagerServerless.Data
 {
@@ -10,9 +9,18 @@ namespace BillManagerServerless.Data
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public long Id { get; set; }
+
+        [Required]
+        [Column(TypeName = "nvarchar(50)")]
         public string FirstName { get; set; }
+
+        [Required]
+        [Column(TypeName = "nvarchar(50)")]
         public string LastName { get; set; }
+
+        [Required]
+        [Column(TypeName = "varchar(20)")]
         public string PhoneNumber { get; set; }
 
         public virtual ICollection<PersonBillShare> PersonBillShares { get; set; }
@@ -20,22 +28,20 @@ namespace BillManagerServerless.Data
 
     public class PersonRequest
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
 
     }
-
     public class PersonDetail
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
         public decimal? Share { get; set; }
 
         public List<BillDetail> Bills { get; set; }
-
     }
 }

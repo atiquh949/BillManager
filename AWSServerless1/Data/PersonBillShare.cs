@@ -3,19 +3,20 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BillManagerServerless.Data
 {
-    [Table("PersonBill")]
+    [Table("PersonBillShare")]
     public class PersonBillShare
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         [ForeignKey("Person")]
-        public int PersonId { get; set; }
+        public long PersonId { get; set; }
 
         [ForeignKey("Bill")]
-        public int BillId { get; set; }
+        public long BillId { get; set; }
 
+        [Column(TypeName = "decimal(18,2)")]
         public decimal Share { get; set; }
 
 

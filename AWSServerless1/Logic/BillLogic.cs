@@ -33,7 +33,7 @@ namespace BillManagerServerless.Logic
             return await _context.Bill.FindAsync(id);
         }
 
-        public async Task<BillDetail> GetBillDetail(int id)
+        public async Task<BillDetail> GetBillDetail(long id)
         {
             Bill bill = await _context.Bill.FindAsync(id);
 
@@ -47,7 +47,7 @@ namespace BillManagerServerless.Logic
             if (bill == null)
                 return null;
 
-            Dictionary<int, decimal> peopleAmounts = _context.PersonBill
+            Dictionary<long, decimal> peopleAmounts = _context.PersonBill
                                                               .Where(pb => pb.BillId == bill.Id)
                                                               .ToDictionary(pb => pb.PersonId, pb => decimal.Parse(string.Format("{0:.##}", pb.Share)));
 
@@ -75,7 +75,7 @@ namespace BillManagerServerless.Logic
                 Id = bill.Id,
                 TotalAmount = bill.TotalAmount,
                 Title = bill.Title,
-                CreateDateTime = bill.Datetime,
+                CreateDateTime = bill.CreateDateTime,
                 People = personBill
             };
 
@@ -95,7 +95,7 @@ namespace BillManagerServerless.Logic
             return GetBillDetail(bill);
         }
 
-        private async Task CreateBillShares(BillRequest billRequest, int billID)
+        private async Task CreateBillShares(BillRequest billRequest, long billID)
         {
             decimal share = billRequest.TotalAmount / billRequest.People.Length;
             List<PersonBillShare> peopleBill = new List<PersonBillShare>();
@@ -127,7 +127,7 @@ namespace BillManagerServerless.Logic
             {
                 TotalAmount = billRequest.TotalAmount,
                 Title = billRequest.Title,
-                Datetime = DateTime.Now
+                CreateDateTime = DateTimeOffset.Now
             };
 
             return bill;

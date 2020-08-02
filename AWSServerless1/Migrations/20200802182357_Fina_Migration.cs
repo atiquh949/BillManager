@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BillManagerServerless.Migrations
 {
-    public partial class initial : Migration
+    public partial class Fina_Migration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,11 +11,11 @@ namespace BillManagerServerless.Migrations
                 name: "Bill",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TotalAmount = table.Column<decimal>(nullable: false),
-                    Title = table.Column<string>(nullable: true),
-                    Datetime = table.Column<DateTime>(nullable: false)
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(100)", nullable: false),
+                    CreateDateTime = table.Column<DateTimeOffset>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -26,11 +26,11 @@ namespace BillManagerServerless.Migrations
                 name: "Person",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
-                    PhoneNumber = table.Column<string>(nullable: true)
+                    FirstName = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    LastName = table.Column<string>(type: "nvarchar(50)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "varchar(20)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -38,47 +38,52 @@ namespace BillManagerServerless.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PersonBill",
+                name: "PersonBillShare",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
+                    Id = table.Column<long>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    PersonId = table.Column<int>(nullable: false),
-                    BillId = table.Column<int>(nullable: false),
-                    Share = table.Column<decimal>(nullable: false)
+                    PersonId = table.Column<long>(nullable: false),
+                    BillId = table.Column<long>(nullable: false),
+                    Share = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PersonBill", x => x.Id);
+                    table.PrimaryKey("PK_PersonBillShare", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_PersonBill_Bill_BillId",
+                        name: "FK_PersonBillShare_Bill_BillId",
                         column: x => x.BillId,
                         principalTable: "Bill",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_PersonBill_Person_PersonId",
+                        name: "FK_PersonBillShare_Person_PersonId",
                         column: x => x.PersonId,
                         principalTable: "Person",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_PersonBill_BillId",
-                table: "PersonBill",
+                name: "IX_Person_PhoneNumber",
+                table: "Person",
+                column: "PhoneNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PersonBillShare_BillId",
+                table: "PersonBillShare",
                 column: "BillId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_PersonBill_PersonId",
-                table: "PersonBill",
+                name: "IX_PersonBillShare_PersonId",
+                table: "PersonBillShare",
                 column: "PersonId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "PersonBill");
+                name: "PersonBillShare");
 
             migrationBuilder.DropTable(
                 name: "Bill");

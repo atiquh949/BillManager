@@ -68,7 +68,9 @@ namespace BillManagerServerless.Controllers
                     return StatusCode(StatusCodes.Status400BadRequest);
                 }
 
-                if (await _logic.GetPerson(id) == null)
+                Person existingPerson;
+
+                if ((existingPerson = await _logic.GetPerson(id)) == null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound);
                 }
@@ -80,7 +82,7 @@ namespace BillManagerServerless.Controllers
                     return StatusCode(StatusCodes.Status403Forbidden, errors);
                 }
 
-                PersonDetail personDetail = await _logic.PutPerson(person);
+                PersonDetail personDetail = await _logic.UpdatePerson(existingPerson, person);
                 return StatusCode(StatusCodes.Status200OK, personDetail);
             }
             catch (Exception e)

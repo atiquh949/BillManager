@@ -21,16 +21,17 @@ namespace BillManagerServerless.Migrations
 
             modelBuilder.Entity("BillManagerServerless.Data.Bill", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("Datetime")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("CreateDateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal(18,2)");
@@ -42,37 +43,43 @@ namespace BillManagerServerless.Migrations
 
             modelBuilder.Entity("BillManagerServerless.Data.Person", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasColumnType("varchar(20)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique();
 
                     b.ToTable("Person");
                 });
 
             modelBuilder.Entity("BillManagerServerless.Data.PersonBillShare", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
+                        .HasColumnType("bigint")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("BillId")
-                        .HasColumnType("int");
+                    b.Property<long>("BillId")
+                        .HasColumnType("bigint");
 
-                    b.Property<int>("PersonId")
-                        .HasColumnType("int");
+                    b.Property<long>("PersonId")
+                        .HasColumnType("bigint");
 
                     b.Property<decimal>("Share")
                         .HasColumnType("decimal(18,2)");
@@ -83,7 +90,7 @@ namespace BillManagerServerless.Migrations
 
                     b.HasIndex("PersonId");
 
-                    b.ToTable("PersonBill");
+                    b.ToTable("PersonBillShare");
                 });
 
             modelBuilder.Entity("BillManagerServerless.Data.PersonBillShare", b =>
@@ -97,7 +104,7 @@ namespace BillManagerServerless.Migrations
                     b.HasOne("BillManagerServerless.Data.Person", "Person")
                         .WithMany("PersonBillShares")
                         .HasForeignKey("PersonId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618
