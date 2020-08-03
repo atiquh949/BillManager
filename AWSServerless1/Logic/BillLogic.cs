@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Amazon.Lambda.Core;
+using BillManagerServerless.Common;
 using BillManagerServerless.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -44,7 +46,7 @@ namespace BillManagerServerless.Logic
 
             Dictionary<long, decimal> peopleAmounts = await _context.PersonBill
                                                               .Where(pb => pb.BillId == bill.Id)
-                                                              .ToDictionaryAsync(pb => pb.PersonId, pb => decimal.Parse(string.Format("{0:.##}", pb.Share)));
+                                                              .ToDictionaryAsync(pb => pb.PersonId, pb => pb.Share);
 
             List<Person> people = _context.Person
                                           .Where(p => peopleAmounts.Keys.Contains(p.Id))
@@ -71,7 +73,7 @@ namespace BillManagerServerless.Logic
                 TotalAmount = bill.TotalAmount,
                 Title = bill.Title,
                 CreateDateTime = bill.CreateDateTime,
-                People = personBill
+                Persons = personBill
             };
 
             return billDetail;
@@ -79,24 +81,47 @@ namespace BillManagerServerless.Logic
 
         public async Task<BillDetail> CreateBill(BillRequest billRequest)
         {
-            Bill bill = GetBillObject(billRequest);
+            using (var dbContextTransaction = _context.Database.BeginTransaction())
+            {
+                try
+                {
+                    Bill bill = GetBillObject(billRequest);
 
-            _context.Bill.Add(bill);
+                    _context.Bill.Add(bill);
 
-            await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
 
-            await CreateBillShares(billRequest, bill.Id);
+                    await CreateBillShares(billRequest, bill.Id);
 
-            return await GetBillDetail(bill);
+                    await dbContextTransaction.CommitAsync();
+
+                    return await GetBillDetail(bill);
+                }
+                catch (Exception e)
+                {
+                    dbContextTransaction.Rollback();
+
+                    //TODO: Overload ToString Method
+                    LambdaLogger.Log("Error in CreateBill. Bill Request: " + billRequest.ToString() + " Exception: " + e.ToString()); 
+
+                    if (e.InnerException != null && e.InnerException.Message.Contains("FK_PersonBillShare_Person_PersonId"))
+                        throw new BillCreatePersonMissingException();
+                    else
+                        throw new BillCreateException();
+                }
+            }
         }
 
         private async Task CreateBillShares(BillRequest billRequest, long billID)
         {
-            decimal share = billRequest.TotalAmount / billRequest.People.Length;
-            List<PersonBillShare> peopleBill = new List<PersonBillShare>();
+            decimal share = billRequest.TotalAmount / billRequest.PersonIds.Length;
             bool pennyAdjustNeeded = ValueHasMoreThanTwoDecimalPlaces(share);
 
-            foreach (long personId in billRequest.People)
+            share = TruncateDecimal(share, 2);
+
+            List<PersonBillShare> peopleBill = new List<PersonBillShare>();
+
+            foreach (long personId in billRequest.PersonIds)
             {
                 PersonBillShare personBill = new PersonBillShare();
                 personBill.PersonId = personId;
@@ -152,10 +177,10 @@ namespace BillManagerServerless.Logic
             if (string.IsNullOrEmpty(billRequest.Title))
                 error_result += "- Title is required." + Environment.NewLine;
 
-            if (billRequest.People == null || billRequest.People.Length == 0)
+            if (billRequest.PersonIds == null || billRequest.PersonIds.Length == 0)
                 error_result += "- Bill must include at least one person." + Environment.NewLine;
 
-            if (billRequest.People.Distinct().Count() != billRequest.People.Count())
+            if (billRequest.PersonIds.Distinct().Count() != billRequest.PersonIds.Count())
                 error_result += "- List of ids of persons associated will bill should have no repeat value." + Environment.NewLine;
 
             return error_result;
@@ -164,6 +189,13 @@ namespace BillManagerServerless.Logic
         public bool ValueHasMoreThanTwoDecimalPlaces(decimal number)
         {
             return (number - Math.Truncate(number)).ToString().Length > 4;
+        }
+
+        public decimal TruncateDecimal(decimal value, int precision)
+        {
+            decimal step = (decimal)Math.Pow(10, precision);
+            decimal tmp = Math.Truncate(step * value);
+            return tmp / step;
         }
     }
 }

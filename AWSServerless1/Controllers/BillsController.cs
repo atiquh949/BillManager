@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
+using BillManagerServerless.Common;
 using BillManagerServerless.Data;
 using BillManagerServerless.Logic;
 using Microsoft.AspNetCore.Http;
@@ -72,6 +73,14 @@ namespace BillManagerServerless.Controllers
 
                 BillDetail bill = await _logic.CreateBill(billRequest);
                 return StatusCode(StatusCodes.Status200OK, bill);
+            }
+            catch (BillCreatePersonMissingException)
+            {
+                return StatusCode(StatusCodes.Status400BadRequest, "Unable to create bill. Associated person does not exist");
+            }
+            catch (BillCreateException)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Unable to create bill");
             }
             catch (Exception e)
             {

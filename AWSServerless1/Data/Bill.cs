@@ -29,7 +29,7 @@ namespace BillManagerServerless.Data
         public long Id { get; set; }
         public decimal TotalAmount { get; set; }
         public string Title { get; set; }
-        public int[] People { get; set; }
+        public int[] PersonIds { get; set; }
     }
 
     public class BillDetail
@@ -39,6 +39,6 @@ namespace BillManagerServerless.Data
         public string Title { get; set; }
         public DateTimeOffset CreateDateTime { get; set; }
 
-        public List<PersonDetail> People { get; set; }
+        public List<PersonDetail> Persons { get; set; }
     }
 }
