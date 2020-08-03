@@ -1,0 +1,404 @@
+{
+	"info": {
+		"_postman_id": "68016734-9144-465d-b4e8-cfdfc48e67d1",
+		"name": "BillManagerCollection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Persons - GET By Id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{Secret}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{EnvURL}}/api/v1/persons/13",
+					"host": [
+						"{{EnvURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"persons",
+						"13"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Persons - GET List",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{Secret}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{EnvURL}}/api/v1/persons",
+					"host": [
+						"{{EnvURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"persons"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Persons - POST",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{Secret}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"John\",\r\n    \"lastName\": \"Doe\",\r\n    \"phoneNumber\": \"781-781-2414\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{EnvURL}}/api/v1/persons",
+					"host": [
+						"{{EnvURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"persons"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Persons - PUT",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{Secret}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"id\": 9,\r\n    \"firstName\": \"Rename\",\r\n    \"lastName\": \"doe\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{EnvURL}}/api/v1/persons/9",
+					"host": [
+						"{{EnvURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"persons",
+						"9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Persons - DELETE",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{Secret}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{EnvURL}}/api/v1/persons/12",
+					"host": [
+						"{{EnvURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"persons",
+						"12"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bills - GET By Id",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{Secret}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{EnvURL}}/api/v1/bills/27",
+					"host": [
+						"{{EnvURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"bills",
+						"27"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bills - GET List",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{Secret}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{EnvURL}}/api/v1/bills",
+					"host": [
+						"{{EnvURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"bills"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bills - POST",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{Secret}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"totalAmount\": 0.01,\r\n    \"title\": \"Resturant Bill\",\r\n    \"personIds\": [13]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{EnvURL}}/api/v1/bills",
+					"host": [
+						"{{EnvURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"bills"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bills - PUT",
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{Secret}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{EnvURL}}/api/v1/bills/1",
+					"host": [
+						"{{EnvURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"bills",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Bills - DELETE",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{Secret}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"firstName\": \"joe\",\r\n    \"lastName\": \"doe\",\r\n    \"phoneNumber\": \"999-781-7815\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{EnvURL}}/api/v1/bills/27",
+					"host": [
+						"{{EnvURL}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"bills",
+						"27"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "S3 Proxy",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"type": "text",
+						"value": "{{Secret}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{EnvURL}}/api/S3Proxy",
+					"host": [
+						"{{EnvURL}}"
+					],
+					"path": [
+						"api",
+						"S3Proxy"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
