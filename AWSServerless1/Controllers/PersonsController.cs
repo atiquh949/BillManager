@@ -4,7 +4,10 @@ using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using BillManagerServerless.Common;
 using BillManagerServerless.Data;
-using BillManagerServerless.Logic;
+using BillManagerServerless.Dto;
+using BillManagerServerless.Models;
+using BillManagerServerless.Models.Requests;
+using BillManagerServerless.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,20 +17,20 @@ namespace BillManagerServerless.Controllers
     [ApiController]
     public class PersonsController : ControllerBase
     {
-        private readonly PersonLogic _logic;
+        private readonly IPersonService _personService;
 
-        public PersonsController(BillManagerDBContext context)
+        public PersonsController(IPersonService personService)
         {
-            _logic = new PersonLogic(context);
+            _personService = personService;
         }
 
         // GET: api/Persons
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<PersonDetail>>> GetPersons()
+        public async Task<ActionResult<IEnumerable<PersonDetailDto>>> GetPersons()
         {
             try
             {
-                return StatusCode(StatusCodes.Status200OK, await _logic.GetPersons());
+                return Ok(await _personService.GetPersonsAsync());
             }
             catch (Exception e)
             {
@@ -38,79 +41,80 @@ namespace BillManagerServerless.Controllers
 
         // GET: api/Persons/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<PersonDetail>> GetPerson(long id)
+        public async Task<ActionResult<PersonDetailDto>> GetPerson(long id)
         {
             try
             {
-                var person = await _logic.GetPersonDetail(id);
+                var person = await _personService.GetPersonDetailAsync(id);
 
                 if (person == null)
                 {
-                    return StatusCode(StatusCodes.Status404NotFound);
+                    return NotFound();
                 }
 
-                return StatusCode(StatusCodes.Status200OK, person);
+                return person;
             }
             catch (Exception e)
             {
-                LambdaLogger.Log("Error in GetPerson: " + e.ToString());
+                LambdaLogger.Log("Error in GetPerson: " + e);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error.");
             }
         }
 
         // PUT: api/Persons/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<PersonDetail>> PutPerson(long id, PersonRequest person)
+        public async Task<ActionResult<PersonDetailDto>> PutPerson(long id, PersonRequest person)
         {
             try
             {
                 if (id != person.Id)
                 {
-                    return StatusCode(StatusCodes.Status400BadRequest);
+                    return BadRequest();
                 }
 
-                Person existingPerson;
+                var existingPerson = await _personService.GetPersonAsync(id);
 
-                if ((existingPerson = await _logic.GetPerson(id)) == null)
+                if (existingPerson == null)
                 {
-                    return StatusCode(StatusCodes.Status404NotFound);
+                    return NotFound();
                 }
 
-                string errors = await _logic.ValidatePerson(person);
-
-                if (!string.IsNullOrEmpty(errors))
+                // Validate Phone 
+                var phoneExists = await _personService.IsPhoneAlreadyExistsAsync(person.Id, person.PhoneNumber);
+                if (phoneExists)
                 {
-                    return StatusCode(StatusCodes.Status403Forbidden, errors);
+                    ModelState.AddModelError(nameof(person.PhoneNumber), "Phone Number already exists.");
+                    return BadRequest(ModelState);
                 }
 
-                PersonDetail personDetail = await _logic.UpdatePerson(existingPerson, person);
-                return StatusCode(StatusCodes.Status200OK, personDetail);
+                return await _personService.UpdatePersonAsync(existingPerson, person);
             }
             catch (Exception e)
             {
-                LambdaLogger.Log("Error in PutPerson: " + e.ToString());
+                LambdaLogger.Log("Error in PutPerson: " + e);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error.");
             }
         }
 
         // POST: api/Persons
         [HttpPost]
-        public async Task<ActionResult<PersonDetail>> PostPerson(PersonRequest person)
+        public async Task<ActionResult<PersonDetailDto>> PostPerson(PersonRequest person)
         {
             try
             {
-                string errors = await _logic.ValidatePerson(person);
-                if (!string.IsNullOrEmpty(errors))
+                // Validate Phone 
+                var phoneExists = await _personService.IsPhoneAlreadyExistsAsync(person.Id, person.PhoneNumber);
+                if (phoneExists)
                 {
-                    return StatusCode(StatusCodes.Status403Forbidden, errors);
+                    ModelState.AddModelError(nameof(person.PhoneNumber), "Phone Number already exists.");
+                    return BadRequest(ModelState);
                 }
 
-                PersonDetail personDetail = await _logic.CreatePerson(person);
-                return StatusCode(StatusCodes.Status200OK, personDetail);
+                return await _personService.CreatePersonAsync(person);
             }
             catch (Exception e)
             {
-                LambdaLogger.Log("Error in PostPerson: " + e.ToString());
+                LambdaLogger.Log("Error in PostPerson: " + e);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error.");
             }
         }
@@ -121,19 +125,20 @@ namespace BillManagerServerless.Controllers
         {
             try
             {
-                var person = await _logic.GetPerson(id);
+                var person = await _personService.GetPersonAsync(id);
 
                 if (person == null)
                 {
                     return StatusCode(StatusCodes.Status404NotFound);
                 }
 
-                await _logic.DeletePerson(person);
-                return StatusCode(StatusCodes.Status200OK);
+                await _personService.DeletePersonAsync(person);
+                return Ok();
             }
             catch (PersonDeleteBillAssociatedException)
             {
-                return StatusCode(StatusCodes.Status409Conflict, "Unable to delete person as its associated with a bill");
+                ModelState.AddModelError(nameof(Person.Id), "Unable to delete person as its associated with a bill");
+                return BadRequest(ModelState);
             }
             catch (PersonDeleteException)
             {
@@ -141,7 +146,7 @@ namespace BillManagerServerless.Controllers
             }
             catch (Exception e)
             {
-                LambdaLogger.Log("Error in DeletePerson: " + e.ToString());
+                LambdaLogger.Log("Error in DeletePerson: " + e);
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error.");
             }
         }

@@ -1,4 +1,5 @@
 using BillManagerServerless.Data;
+using BillManagerServerless.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,8 @@ namespace BillManagerServerless
         // This method gets called by the runtime. Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddJsonOptions(options => {
+            services.AddControllers().AddJsonOptions(options =>
+            {
                 options.JsonSerializerOptions.IgnoreNullValues = true;
             });
 
@@ -32,6 +34,13 @@ namespace BillManagerServerless
 
             // Add S3 to the ASP.NET Core dependency injection framework.
             services.AddAWSService<Amazon.S3.IAmazonS3>();
+
+            #region Services
+
+            services.AddTransient<IPersonService, PersonService>();
+            services.AddTransient<IBillService, BillService>();
+
+            #endregion
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>

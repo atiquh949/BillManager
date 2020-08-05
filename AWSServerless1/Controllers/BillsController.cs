@@ -4,7 +4,10 @@ using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using BillManagerServerless.Common;
 using BillManagerServerless.Data;
-using BillManagerServerless.Logic;
+using BillManagerServerless.Dto;
+using BillManagerServerless.Models;
+using BillManagerServerless.Models.Requests;
+using BillManagerServerless.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,20 +17,20 @@ namespace BillManagerServerless.Controllers
     [ApiController]
     public class BillsController : ControllerBase
     {
-        private readonly BillLogic _logic;
+        private readonly IBillService _billService;
 
-        public BillsController(BillManagerDBContext context)
+        public BillsController(IBillService billService)
         {
-            _logic = new BillLogic(context);
+            _billService = billService;
         }
 
         // GET: api/Bills
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BillDetail>>> GetBills()
+        public async Task<ActionResult<IEnumerable<BillDetailDto>>> GetBills()
         {
             try
             {
-                return StatusCode(StatusCodes.Status200OK, await _logic.GetBills());
+                return await _billService.GetBillsAsync();
             }
             catch (Exception e)
             {
@@ -38,18 +41,18 @@ namespace BillManagerServerless.Controllers
 
         // GET: api/Bills/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<BillDetail>> GetBill(long id)
+        public async Task<ActionResult<BillDetailDto>> GetBill(long id)
         {
             try
             {
-                var billDetail = await _logic.GetBillDetail(id);
+                var billDetail = await _billService.GetBillDetailAsync(id);
 
                 if (billDetail == null)
                 {
-                    return StatusCode(StatusCodes.Status404NotFound);
+                    return NotFound();
                 }
 
-                return StatusCode(StatusCodes.Status200OK, billDetail);
+                return billDetail;
             }
             catch (Exception e)
             {
@@ -60,32 +63,25 @@ namespace BillManagerServerless.Controllers
 
         // POST: api/Bills
         [HttpPost]
-        public async Task<ActionResult<BillDetail>> PostBill(BillRequest billRequest)
+        public async Task<ActionResult<BillDetailDto>> PostBill(BillRequest billRequest)
         {
             try
             {
-                string errors = _logic.ValidateBillRequest(billRequest);
-
-                if (!String.IsNullOrEmpty(errors))
-                {
-                    return StatusCode(StatusCodes.Status403Forbidden, errors);
-                }
-
-                BillDetail bill = await _logic.CreateBill(billRequest);
-                return StatusCode(StatusCodes.Status200OK, bill);
+                BillDetailDto bill = await _billService.CreateBillAsync(billRequest);
+                return bill;
             }
             catch (BillCreatePersonMissingException)
             {
-                return StatusCode(StatusCodes.Status400BadRequest, "Unable to create bill. Associated person does not exist");
+                return BadRequest("Unable to create bill. Associated person does not exist");
             }
             catch (BillCreateException)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Unable to create bill");
+                return StatusCode(StatusCodes.Status500InternalServerError, "");
             }
             catch (Exception e)
             {
                 LambdaLogger.Log("Error in PostBill" + e.ToString());
-                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error.");
+                return StatusCode(StatusCodes.Status500InternalServerError, "Internal Server Error."); //TODO: return reference
             }
         }
 
@@ -95,15 +91,15 @@ namespace BillManagerServerless.Controllers
         {
             try
             {
-                var bill = await _logic.GetBill(id);
+                var bill = await _billService.GetBillAsync(id);
 
                 if (bill == null)
                 {
-                    return StatusCode(StatusCodes.Status404NotFound);
+                    return NotFound();
                 }
 
-                await _logic.DeleteBill(bill);
-                return StatusCode(StatusCodes.Status200OK);
+                await _billService.DeleteBillAsync(bill);
+                return Ok();
             }
             catch (Exception e)
             {

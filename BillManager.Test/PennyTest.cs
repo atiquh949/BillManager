@@ -1,16 +1,17 @@
-using BillManagerServerless.Logic;
+using BillManagerServerless.Helpers;
+using BillManagerServerless.Services;
 using NUnit.Framework;
 
 namespace BillManagerService.Test
 {
     public class Tests
     {
-        BillLogic _billLogic;
+        BillService _billService;
 
         [SetUp]
         public void Setup()
         {
-            _billLogic = new BillLogic(null); ;
+            _billService = new BillService(null); ;
         }
 
         [TestCase(10.00, 1, false)]
@@ -22,7 +23,7 @@ namespace BillManagerService.Test
         public void PennyNeedsAdjustmentTest(decimal total, int numOfPersons, bool pennyNeedsAdjustment)
         {
             decimal share = total / numOfPersons;
-            Assert.AreEqual(_billLogic.ValueHasMoreThanTwoDecimalPlaces(share), pennyNeedsAdjustment, "PennyNeedsAdjustmentTest failed on total: " + total + " numOfPersons: " + numOfPersons);
+            Assert.AreEqual(NumberHelper.ValueHasMoreThanTwoDecimalPlaces(share), pennyNeedsAdjustment, "PennyNeedsAdjustmentTest failed on total: " + total + " numOfPersons: " + numOfPersons);
         }
     }
 }

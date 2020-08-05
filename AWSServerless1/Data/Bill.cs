@@ -23,22 +23,4 @@ namespace BillManagerServerless.Data
 
         public virtual ICollection<PersonBillShare> PersonBillShares { get; set; }
     }
-
-    public class BillRequest
-    {
-        public long Id { get; set; }
-        public decimal TotalAmount { get; set; }
-        public string Title { get; set; }
-        public int[] PersonIds { get; set; }
-    }
-
-    public class BillDetail
-    {
-        public long Id { get; set; }
-        public decimal? TotalAmount { get; set; }
-        public string Title { get; set; }
-        public DateTimeOffset CreateDateTime { get; set; }
-
-        public List<PersonDetail> Persons { get; set; }
-    }
 }
